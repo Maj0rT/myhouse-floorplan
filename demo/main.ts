@@ -86,17 +86,28 @@ const initialStates: Record<string, HassEntity> = {
   },
 };
 
+function setStatus(msg: string): void {
+  const el = document.getElementById('status');
+  if (el) el.textContent = msg;
+  console.info('[demo]', msg);
+}
+
 const hass: HomeAssistant = {
   states: { ...initialStates },
   callService: async (domain, service, data) => {
     const entityId = (data?.entity_id as string | undefined) ?? '';
     const entity = hass.states[entityId];
-    if (!entity) return;
-    console.info('[mock callService]', domain, service, data);
+    if (!entity) {
+      setStatus(`callService: ${domain}.${service}(${entityId}) — entity nicht gefunden`);
+      return;
+    }
     if (service === 'toggle') {
       const next = entity.state === 'on' || entity.state === 'open' ? 'off' : 'on';
       hass.states[entityId] = { ...entity, state: next };
       refreshHass();
+      setStatus(`${entityId}: ${entity.state} → ${next}`);
+    } else {
+      setStatus(`callService: ${domain}.${service}(${entityId})`);
     }
   },
   auth: { data: { access_token: 'DEMO_TOKEN' } },
@@ -152,7 +163,20 @@ document.querySelectorAll<HTMLButtonElement>('.controls button').forEach((btn) =
       if (entity) {
         hass.states[entityId] = { ...entity, state };
         refreshHass();
+        setStatus(`${entityId}: → ${state}`);
       }
     }
   });
 });
+
+card.addEventListener('marker-click', (event) => {
+  const detail = (event as CustomEvent<{ entityId?: string }>).detail;
+  setStatus(`marker-click: ${detail?.entityId ?? '?'}`);
+});
+
+window.addEventListener('hass-more-info', (event) => {
+  const detail = (event as CustomEvent<{ entityId?: string }>).detail;
+  setStatus(`more-info: ${detail?.entityId ?? '?'}`);
+});
+
+setStatus('Demo geladen — klicke einen Marker oder Button');
