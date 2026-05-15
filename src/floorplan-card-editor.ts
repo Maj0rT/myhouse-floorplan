@@ -73,15 +73,35 @@ export class FloorplanCardEditor extends LitElement {
     }
     .marker-item {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px 0;
       border-bottom: 1px solid var(--divider-color, #eee);
       font-size: 13px;
+    }
+    .marker-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .marker-item .entity {
       flex: 1;
       font-family: monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .marker-item .position {
+      color: var(--secondary-text-color, #999);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .label-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px 8px;
+      border: 1px solid var(--divider-color, #ccc);
+      border-radius: 4px;
+      font-size: 12px;
     }
     .preview {
       position: relative;
@@ -159,6 +179,13 @@ export class FloorplanCardEditor extends LitElement {
 
   private removeMarker(index: number): void {
     const markers = this.config.markers.filter((_, i) => i !== index);
+    this.emitChange({ ...this.config, markers });
+  }
+
+  private updateMarkerLabel(index: number, label: string): void {
+    const markers = this.config.markers.map((m, i) =>
+      i === index ? { ...m, label: label.length > 0 ? label : undefined } : m,
+    );
     this.emitChange({ ...this.config, markers });
   }
 
@@ -258,11 +285,23 @@ export class FloorplanCardEditor extends LitElement {
               ${this.config.markers.map(
                 (marker, index) => html`
                   <div class="marker-item">
-                    <div class="entity">${marker.entity}</div>
-                    <div>x: ${marker.x.toFixed(0)}%, y: ${marker.y.toFixed(0)}%</div>
-                    <button class="remove danger" @click=${() => this.removeMarker(index)}>
-                      Entfernen
-                    </button>
+                    <div class="marker-row">
+                      <div class="entity">${marker.entity}</div>
+                      <div class="position">
+                        ${marker.x.toFixed(0)}% / ${marker.y.toFixed(0)}%
+                      </div>
+                      <button class="remove danger" @click=${() => this.removeMarker(index)}>
+                        Entfernen
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      class="label-input"
+                      placeholder="Beschriftung (leer = friendly_name)"
+                      .value=${marker.label ?? ''}
+                      @input=${(e: Event) =>
+                        this.updateMarkerLabel(index, (e.target as HTMLInputElement).value)}
+                    />
                   </div>
                 `,
               )}
