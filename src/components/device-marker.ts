@@ -20,8 +20,7 @@ export class DeviceMarker extends LitElement {
 
   static styles = css`
     :host {
-      position: absolute;
-      pointer-events: none;
+      display: contents;
     }
     .marker {
       position: absolute;
