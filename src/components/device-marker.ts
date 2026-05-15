@@ -91,7 +91,7 @@ export class DeviceMarker extends LitElement {
   }
 
   private resolveLabel(): string {
-    if (this.label) return this.label;
+    if (this.label !== undefined) return this.label;
     const friendly = this.entity?.attributes?.friendly_name;
     if (typeof friendly === 'string') return friendly;
     return this.entity?.entity_id ?? '';

@@ -65,6 +65,15 @@ describe('device-marker', () => {
     expect(label?.textContent?.trim()).toBe('Kueche');
   });
 
+  it('hides the label when label prop is explicit empty string', async () => {
+    el.entity = makeEntity('light.a', 'on', { friendly_name: 'Kueche' });
+    el.position = { x: 0, y: 0 };
+    el.label = '';
+    await nextRender(el);
+    const label = el.shadowRoot?.querySelector('.label');
+    expect(label).toBeNull();
+  });
+
   it('uses icon override when provided', async () => {
     el.entity = makeEntity('light.a', 'on');
     el.position = { x: 0, y: 0 };

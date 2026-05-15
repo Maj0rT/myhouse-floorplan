@@ -86,7 +86,7 @@ export class FloorplanCard extends LitElement {
       <myhouse-device-marker
         .entity=${entity}
         .position=${{ x: marker.x, y: marker.y }}
-        .label=${marker.label ?? ''}
+        .label=${marker.label}
         .icon=${marker.icon ?? ''}
       ></myhouse-device-marker>
     `;

@@ -184,9 +184,16 @@ export class FloorplanCardEditor extends LitElement {
 
   private updateMarkerLabel(index: number, label: string): void {
     const markers = this.config.markers.map((m, i) =>
-      i === index ? { ...m, label: label.length > 0 ? label : undefined } : m,
+      i === index ? { ...m, label } : m,
     );
     this.emitChange({ ...this.config, markers });
+  }
+
+  private suggestLabel(entityId: string): string {
+    const entity = this.hass?.states[entityId];
+    const friendly = entity?.attributes?.friendly_name;
+    if (typeof friendly === 'string') return friendly;
+    return entityId;
   }
 
   private startDrag(index: number, event: MouseEvent): void {
@@ -222,7 +229,7 @@ export class FloorplanCardEditor extends LitElement {
       <myhouse-device-marker
         .entity=${entity}
         .position=${{ x: marker.x, y: marker.y }}
-        .label=${marker.label ?? ''}
+        .label=${marker.label}
         .icon=${marker.icon ?? ''}
         edit-mode
         @mousedown=${(e: MouseEvent) => this.startDrag(index, e)}
@@ -297,8 +304,8 @@ export class FloorplanCardEditor extends LitElement {
                     <input
                       type="text"
                       class="label-input"
-                      placeholder="Beschriftung (leer = friendly_name)"
-                      .value=${marker.label ?? ''}
+                      placeholder="Beschriftung (leer = ausblenden)"
+                      .value=${marker.label ?? this.suggestLabel(marker.entity)}
                       @input=${(e: Event) =>
                         this.updateMarkerLabel(index, (e.target as HTMLInputElement).value)}
                     />
