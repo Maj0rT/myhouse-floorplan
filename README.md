@@ -60,12 +60,17 @@ markers:
 
 ```bash
 npm install
+npm run dev           # Standalone-Demo unter http://localhost:5173/
 npm run build         # Build erzeugt dist/myhouse-floorplan.js
 npm test              # Vitest unit-tests
 npm run test:coverage # Coverage-report
 npm run lint
 npm run typecheck
 ```
+
+## Standalone-Demo
+
+Die Karte laesst sich ohne Home Assistant testen — `npm run dev` startet einen Vite-Server mit einer Demo-Seite (`demo/index.html`), die Mock-Versionen von `ha-card` und `ha-icon` bereitstellt und ein paar Test-Entities (Lampen, Schalter, Sensor, Rolladen) anlegt. Du siehst View-Card und Editor nebeneinander, kannst Marker verschieben, und ueber Buttons im Header die Entity-States umschalten. Datei-Upload geht nicht (echte HA-API fehlt) — Image-URL-Eingabe funktioniert aber.
 
 ## Lizenz
 
