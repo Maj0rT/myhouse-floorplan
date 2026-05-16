@@ -63,7 +63,6 @@ export class FloorplanCard extends LitElement {
       background: var(--card-background-color, #fff);
       color: var(--primary-text-color, #212121);
       border-radius: 8px;
-      width: 85vw;
       max-width: 85vw;
       max-height: 90vh;
       display: flex;
@@ -97,9 +96,12 @@ export class FloorplanCard extends LitElement {
     }
     .camera-stream {
       display: block;
-      width: 100%;
+      /* Stream-Breite so waehlen, dass die 16:9-hoehe in den verbleibenden
+         vertikalen platz passt — sonst nehmen wir 85vw. So bleibt das Bild
+         vollstaendig sichtbar (kein cropping), ohne ueber den modal-rand
+         hinauszugehen. */
+      width: min(85vw, calc((90vh - 60px) * 16 / 9));
       aspect-ratio: 16 / 9;
-      max-height: calc(90vh - 50px);
       background: #000;
     }
     .camera-stream::part(video),
