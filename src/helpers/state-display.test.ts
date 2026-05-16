@@ -92,4 +92,39 @@ describe('getStateDisplay', () => {
     const result = getStateDisplay(makeEntity('weird.thing', 'foo'));
     expect(result.icon).toBe('mdi:eye');
   });
+
+  it('hides the icon for sensors with device_class temperature', () => {
+    const result = getStateDisplay(
+      makeEntity('sensor.bad', '21.5', {
+        device_class: 'temperature',
+        unit_of_measurement: '°C',
+      }),
+    );
+    expect(result.hide_icon).toBe(true);
+    expect(result.text).toBe('21.5 °C');
+  });
+
+  it('keeps the icon for non-temperature sensors', () => {
+    const result = getStateDisplay(
+      makeEntity('sensor.humidity', '60', { device_class: 'humidity' }),
+    );
+    expect(result.hide_icon).toBeFalsy();
+  });
+
+  it('returns entity_picture as image_url for camera entities', () => {
+    const result = getStateDisplay(
+      makeEntity('camera.flur', 'idle', {
+        entity_picture: '/api/camera_proxy/camera.flur?token=abc',
+      }),
+    );
+    expect(result.image_url).toBe('/api/camera_proxy/camera.flur?token=abc');
+    expect(result.icon).toBe('mdi:cctv');
+  });
+
+  it('uses active color for streaming/recording cameras', () => {
+    const streaming = getStateDisplay(makeEntity('camera.a', 'streaming'));
+    expect(streaming.color).toContain('active');
+    const idle = getStateDisplay(makeEntity('camera.a', 'idle'));
+    expect(idle.color).not.toContain('active');
+  });
 });

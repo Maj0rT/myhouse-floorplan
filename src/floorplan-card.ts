@@ -13,6 +13,7 @@ function fireEvent(target: HTMLElement, type: string, detail: unknown): void {
 export class FloorplanCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
   @state() private config?: FloorplanConfig;
+  @state() private cameraStreamEntityId: string | null = null;
 
   static async getConfigElement(): Promise<HTMLElement> {
     await import('./floorplan-card-editor.js');
@@ -44,6 +45,66 @@ export class FloorplanCard extends LitElement {
       position: relative;
       width: 100%;
     }
+    .modal-host {
+      display: contents;
+    }
+    .camera-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .camera-modal-content {
+      background: var(--card-background-color, #fff);
+      color: var(--primary-text-color, #212121);
+      border-radius: 8px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    .camera-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px 8px 16px;
+      border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    }
+    .camera-modal-title {
+      font-weight: 500;
+      font-size: 16px;
+    }
+    .camera-modal-close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--primary-text-color, #212121);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .camera-modal-close:hover {
+      background: var(--secondary-background-color, #f0f0f0);
+    }
+    .camera-stream {
+      max-width: 100%;
+      max-height: calc(90vh - 60px);
+      display: block;
+    }
+    .camera-stream-error {
+      padding: 24px;
+      text-align: center;
+      color: var(--error-color, #db4437);
+      font-size: 14px;
+    }
   `;
 
   setConfig(config: FloorplanConfig): void {
@@ -70,6 +131,13 @@ export class FloorplanCard extends LitElement {
     const marker = this.config.markers.find((m) => m.entity === entityId);
     const action = marker?.tap_action ?? 'toggle';
 
+    // Kameras: bei tap_action 'toggle' (default) zeigen wir den live-stream
+    // als eigenes popup statt ueber HAs more-info-dialog.
+    if (entityId.startsWith('camera.') && action === 'toggle') {
+      this.cameraStreamEntityId = entityId;
+      return;
+    }
+
     try {
       await handleTap(entityId, action, this.hass, (type, detail) =>
         fireEvent(this, type, detail),
@@ -78,6 +146,58 @@ export class FloorplanCard extends LitElement {
       const message = err instanceof Error ? err.message : 'Service-Call fehlgeschlagen';
       fireEvent(this, 'hass-notification', { message });
     }
+  }
+
+  private closeCameraStream(): void {
+    this.cameraStreamEntityId = null;
+  }
+
+  private onCameraModalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.closeCameraStream();
+    }
+  }
+
+  private renderCameraStream() {
+    if (!this.cameraStreamEntityId) return '';
+    const entity = this.hass?.states[this.cameraStreamEntityId];
+    const entityPicture = entity?.attributes?.entity_picture;
+    const streamUrl =
+      typeof entityPicture === 'string'
+        ? entityPicture.replace('/camera_proxy/', '/camera_proxy_stream/')
+        : '';
+    const friendly = entity?.attributes?.friendly_name;
+    const title =
+      typeof friendly === 'string' && friendly.length > 0
+        ? friendly
+        : this.cameraStreamEntityId;
+    return html`
+      <div
+        class="camera-modal"
+        role="dialog"
+        tabindex="-1"
+        @click=${this.closeCameraStream}
+        @keydown=${this.onCameraModalKeydown}
+      >
+        <div class="camera-modal-content" @click=${(e: Event) => e.stopPropagation()}>
+          <div class="camera-modal-header">
+            <span class="camera-modal-title">${title}</span>
+            <button
+              class="camera-modal-close"
+              aria-label="Schliessen"
+              @click=${this.closeCameraStream}
+            >
+              ✕
+            </button>
+          </div>
+          ${streamUrl
+            ? html`<img class="camera-stream" src=${streamUrl} alt=${title} />`
+            : html`<div class="camera-stream-error">
+                Kein Stream-URL verfuegbar (entity_picture fehlt am Camera-Entity)
+              </div>`}
+        </div>
+      </div>
+    `;
   }
 
   private renderMarker(marker: MarkerConfig) {
@@ -108,6 +228,7 @@ export class FloorplanCard extends LitElement {
           </myhouse-floor-image>
         </div>
       </ha-card>
+      <div class="modal-host">${this.renderCameraStream()}</div>
     `;
   }
 }

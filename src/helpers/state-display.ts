@@ -4,6 +4,8 @@ export interface StateDisplay {
   icon: string;
   color: string;
   text?: string;
+  image_url?: string;
+  hide_icon?: boolean;
 }
 
 const COLOR_ACTIVE = 'var(--paper-item-icon-active-color, #fdd835)';
@@ -48,10 +50,25 @@ export function getStateDisplay(entity: HassEntity | undefined): StateDisplay {
     case 'sensor': {
       const unit = entity.attributes?.unit_of_measurement;
       const text = unit ? `${state} ${unit}` : state;
+      const deviceClass = entity.attributes?.device_class;
+      // Bei Temperatur-Sensoren wird nur der Wert angezeigt — das icon waere
+      // redundant zum aussagekraeftigen Zahlenwert + Einheit.
+      const hideIcon = deviceClass === 'temperature';
       return {
         icon: pickIcon(entity, 'mdi:gauge'),
         color: COLOR_INACTIVE,
         text,
+        hide_icon: hideIcon,
+      };
+    }
+    case 'camera': {
+      const picture = entity.attributes?.entity_picture;
+      const pictureUrl = typeof picture === 'string' ? picture : undefined;
+      const isActive = state === 'streaming' || state === 'recording';
+      return {
+        icon: 'mdi:cctv',
+        color: isActive ? COLOR_ACTIVE : COLOR_INACTIVE,
+        image_url: pictureUrl,
       };
     }
     case 'cover': {

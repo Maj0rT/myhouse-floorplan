@@ -22,6 +22,8 @@ const ICON_SVG: Record<string, string> = {
     '<path d="M4 4h16v3H4zm0 5h16v2H4zm0 11v-3h16v3z"/>',
   'mdi:eye':
     '<path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5C21.3 7.6 17 4.5 12 4.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>',
+  'mdi:cctv':
+    '<path d="M3 4l16 4-1 3-6-1.5-2 5L8 14l-5-1z M4 18h16v2H4z"/>',
   'mdi:help-circle-outline':
     '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm1-5h-2v-2h2zm2.07-7.75-.9.92C13.45 8.9 13 9.5 13 11h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26a2 2 0 1 0-3.41-1.41h-2a4 4 0 1 1 7.07 2.25z"/>',
   'mdi:alert-circle':
@@ -46,6 +48,14 @@ class MockHaIcon extends HTMLElement {
 customElements.define('ha-icon', MockHaIcon);
 
 const DEMO_IMAGE = buildDemoFloorplan();
+
+function buildCameraSnapshot(label: string, color: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120">
+    <rect width="160" height="120" fill="${color}"/>
+    <text x="80" y="65" text-anchor="middle" font-family="system-ui" font-size="14" fill="rgba(0,0,0,0.6)">CAM ${label}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
 
 function buildDemoFloorplan(): string {
   const svg = `
@@ -99,6 +109,14 @@ const initialStates: Record<string, HassEntity> = {
     state: 'off',
     attributes: { friendly_name: 'Bewegung Flur', device_class: 'motion' },
   },
+  'camera.flur': {
+    entity_id: 'camera.flur',
+    state: 'idle',
+    attributes: {
+      friendly_name: 'Kamera Flur',
+      entity_picture: buildCameraSnapshot('Flur', '#5a7090'),
+    },
+  },
 };
 
 function setStatus(msg: string): void {
@@ -139,6 +157,7 @@ const initialConfig: FloorplanConfig = {
     { entity: 'binary_sensor.bewegung_flur', x: 64, y: 60, label: 'Flur-Sensor' },
     { entity: 'sensor.temperatur_bad', x: 88, y: 74 },
     { entity: 'cover.rolladen_west', x: 75, y: 26 },
+    { entity: 'camera.flur', x: 50, y: 50 },
   ],
 };
 

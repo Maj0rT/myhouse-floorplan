@@ -107,4 +107,30 @@ describe('device-marker', () => {
     const haIcon = el.shadowRoot?.querySelector('ha-icon');
     expect(haIcon?.getAttribute('icon')).toBe('mdi:lightbulb');
   });
+
+  it('renders an img preview instead of icon for camera entities', async () => {
+    el.entity = makeEntity('camera.flur', 'idle', {
+      entity_picture: '/api/camera_proxy/camera.flur?token=xyz',
+    });
+    el.position = { x: 0, y: 0 };
+    await nextRender(el);
+    const img = el.shadowRoot?.querySelector('img.preview') as HTMLImageElement;
+    expect(img).toBeTruthy();
+    expect(img.getAttribute('src')).toBe('/api/camera_proxy/camera.flur?token=xyz');
+    const haIcon = el.shadowRoot?.querySelector('ha-icon');
+    expect(haIcon).toBeNull();
+  });
+
+  it('hides the icon when state-display sets hide_icon', async () => {
+    el.entity = makeEntity('sensor.bad', '21.5', {
+      device_class: 'temperature',
+      unit_of_measurement: '°C',
+    });
+    el.position = { x: 0, y: 0 };
+    await nextRender(el);
+    const haIcon = el.shadowRoot?.querySelector('ha-icon');
+    expect(haIcon).toBeNull();
+    const text = el.shadowRoot?.querySelector('.text');
+    expect(text?.textContent?.trim()).toBe('21.5 °C');
+  });
 });

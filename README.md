@@ -6,8 +6,11 @@ Eine Home-Assistant-Lovelace-Karte, mit der du ein Bild einer Etage hochlaedst u
 
 - Bild-Upload direkt aus dem Lovelace-Editor (kein Zugriff auf das Dateisystem noetig)
 - Drag-and-Drop zum Platzieren der Geraete auf dem Bild
-- Statusanzeige fuer `light`, `switch`, `binary_sensor`, `sensor`, `cover`
+- Statusanzeige fuer `light`, `switch`, `binary_sensor`, `sensor`, `cover`, `camera`
 - Klick auf einen Marker schaltet das Geraet (oder oeffnet die more-info-Ansicht)
+- **Kameras:** Mini-Snapshot direkt am Marker; Klick oeffnet den Live-Stream als Popup (mjpeg-stream ueber `/api/camera_proxy_stream/`)
+- **Temperatur-Sensoren** (`device_class: temperature`): zeigen nur den Wert, kein Icon (Wert + Einheit ist aussagekraeftig genug)
+- **Cover/Rollladen:** State-abhaengiges Icon (`mdi:window-shutter-open` bei offen, `mdi:window-shutter` bei geschlossen). Das Icon einiger Integrationen (z.B. Homematic) wird bewusst uebersteuert, weil es statisch ist.
 - Responsive: Marker-Positionen sind in % gespeichert
 
 ## Installation

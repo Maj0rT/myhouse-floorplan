@@ -99,6 +99,83 @@ describe('floorplan-card', () => {
     expect(el.getCardSize()).toBeGreaterThan(0);
   });
 
+  it('opens the camera-stream modal when a camera marker is clicked', async () => {
+    const hass: HomeAssistant = {
+      states: {
+        'camera.flur': {
+          entity_id: 'camera.flur',
+          state: 'idle',
+          attributes: {
+            friendly_name: 'Kamera Flur',
+            entity_picture: '/api/camera_proxy/camera.flur?token=tok1',
+          },
+        },
+      },
+      callService: vi.fn().mockResolvedValue(undefined),
+    };
+    el.hass = hass;
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      markers: [{ entity: 'camera.flur', x: 10, y: 10 }],
+    });
+    await nextRender(el);
+
+    const marker = el.shadowRoot?.querySelector('myhouse-device-marker') as HTMLElement;
+    marker.dispatchEvent(
+      new CustomEvent('marker-click', {
+        detail: { entityId: 'camera.flur' },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await nextRender(el);
+
+    const modal = el.shadowRoot?.querySelector('.camera-modal');
+    expect(modal).toBeTruthy();
+    const streamImg = el.shadowRoot?.querySelector('img.camera-stream') as HTMLImageElement;
+    expect(streamImg.getAttribute('src')).toBe(
+      '/api/camera_proxy_stream/camera.flur?token=tok1',
+    );
+    expect(hass.callService).not.toHaveBeenCalled();
+  });
+
+  it('closes the camera-stream modal when the close button is clicked', async () => {
+    const hass: HomeAssistant = {
+      states: {
+        'camera.a': {
+          entity_id: 'camera.a',
+          state: 'idle',
+          attributes: { entity_picture: '/api/camera_proxy/camera.a' },
+        },
+      },
+      callService: vi.fn(),
+    };
+    el.hass = hass;
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      markers: [{ entity: 'camera.a', x: 0, y: 0 }],
+    });
+    await nextRender(el);
+
+    const marker = el.shadowRoot?.querySelector('myhouse-device-marker') as HTMLElement;
+    marker.dispatchEvent(
+      new CustomEvent('marker-click', {
+        detail: { entityId: 'camera.a' },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await nextRender(el);
+    expect(el.shadowRoot?.querySelector('.camera-modal')).toBeTruthy();
+
+    const closeBtn = el.shadowRoot?.querySelector('.camera-modal-close') as HTMLButtonElement;
+    closeBtn.click();
+    await nextRender(el);
+    expect(el.shadowRoot?.querySelector('.camera-modal')).toBeNull();
+  });
+
   it('passes background_opacity from each marker through to the device-marker', async () => {
     el.hass = makeHass();
     el.setConfig({
