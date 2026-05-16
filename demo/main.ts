@@ -102,7 +102,11 @@ const initialStates: Record<string, HassEntity> = {
   'sensor.temperatur_bad': {
     entity_id: 'sensor.temperatur_bad',
     state: '21.5',
-    attributes: { friendly_name: 'Temperatur Bad', unit_of_measurement: '°C' },
+    attributes: {
+      friendly_name: 'Temperatur Bad',
+      unit_of_measurement: '°C',
+      device_class: 'temperature',
+    },
   },
   'binary_sensor.bewegung_flur': {
     entity_id: 'binary_sensor.bewegung_flur',
