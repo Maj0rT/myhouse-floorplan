@@ -12,11 +12,16 @@ Eine Home-Assistant-Lovelace-Karte, mit der du ein Bild einer Etage hochlaedst u
 
 ## Installation
 
-### Via HACS
+### Via HACS (Custom Repository)
 
-1. HACS oeffnen → "Frontend"
-2. "+ Explore & Download Repositories" → Custom Repo hinzufuegen mit dieser URL
-3. Karte installieren und Browser-Cache leeren
+1. In Home Assistant **HACS** oeffnen → Reiter **Frontend**
+2. Oben rechts **drei Punkte** → **Custom repositories**
+3. Eintragen:
+   - **Repository:** `https://github.com/Maj0rT/myhouse-floorplan`
+   - **Category:** **Dashboard** (frueher "Lovelace")
+4. **Add** klicken, dann den neuen Eintrag in der Liste anklicken → **Download**
+5. Browser-Cache leeren (Cmd/Ctrl+Shift+R)
+6. In einem Dashboard: Karte hinzufuegen → "MyHouse Floorplan" erscheint im visuellen Picker
 
 ### Manuell
 
@@ -71,6 +76,22 @@ npm run typecheck
 ## Standalone-Demo
 
 Die Karte laesst sich ohne Home Assistant testen — `npm run dev` startet einen Vite-Server mit einer Demo-Seite (`demo/index.html`), die Mock-Versionen von `ha-card` und `ha-icon` bereitstellt und ein paar Test-Entities (Lampen, Schalter, Sensor, Rolladen) anlegt. Du siehst View-Card und Editor nebeneinander, kannst Marker verschieben, und ueber Buttons im Header die Entity-States umschalten. Datei-Upload geht nicht (echte HA-API fehlt) — Image-URL-Eingabe funktioniert aber.
+
+## Release-Workflow
+
+Neue Versionen werden via Git-Tag veroeffentlicht. Der GitHub-Actions-Workflow in `.github/workflows/release.yml` triggert auf Tags `v*`, laesst lint/typecheck/test/build laufen und legt automatisch ein GitHub-Release mit dem gebauten Bundle (`dist/myhouse-floorplan.js`) als Asset an. Release-Notes werden aus den Commits seit dem letzten Tag generiert. HACS-Nutzer sehen die neue Version dann automatisch und koennen sie installieren.
+
+```bash
+# package.json-Version bumpen, commit + tag automatisch erzeugen
+npm version patch    # 0.1.0 → 0.1.1 (bugfixes)
+npm version minor    # 0.1.0 → 0.2.0 (neue features)
+npm version major    # 0.1.0 → 1.0.0 (breaking changes)
+
+# Tag + commit hochpushen — der workflow uebernimmt den rest
+git push && git push --tags
+```
+
+Wenn der Workflow fehlschlaegt (z.B. rote Tests), wird kein Release erstellt — Tag bleibt aber bestehen. Nach Fix: Tag loeschen (`git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z`) und neu setzen.
 
 ## Lizenz
 
