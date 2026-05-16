@@ -63,7 +63,8 @@ export class FloorplanCard extends LitElement {
       background: var(--card-background-color, #fff);
       color: var(--primary-text-color, #212121);
       border-radius: 8px;
-      max-width: 90vw;
+      width: 85vw;
+      max-width: 85vw;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
@@ -95,7 +96,7 @@ export class FloorplanCard extends LitElement {
       background: var(--secondary-background-color, #f0f0f0);
     }
     .camera-stream {
-      max-width: 100%;
+      width: 100%;
       max-height: calc(90vh - 60px);
       display: block;
     }
