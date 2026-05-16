@@ -10,6 +10,7 @@ export interface StateDisplay {
 const COLOR_ACTIVE = 'var(--paper-item-icon-active-color, #fdd835)';
 const COLOR_INACTIVE = 'var(--paper-item-icon-color, #9e9e9e)';
 const COLOR_ERROR = 'var(--error-color, #db4437)';
+const COLOR_CAMERA = 'var(--info-color, #039be5)';
 
 function pickIcon(entity: HassEntity, fallback: string): string {
   const attrIcon = entity.attributes?.icon;
@@ -61,10 +62,14 @@ export function getStateDisplay(entity: HassEntity | undefined): StateDisplay {
       };
     }
     case 'camera': {
+      // Kameras sind in HA meistens im 'idle'-state — auch wenn sie aktiv
+      // betriebsbereit sind. Das default-grau waere damit fast immer zu sehen
+      // und zu unauffaellig. Stattdessen kraeftiges info-blau als ruhefarbe;
+      // streaming/recording wird zusaetzlich gelb (active) hervorgehoben.
       const isActive = state === 'streaming' || state === 'recording';
       return {
         icon: 'mdi:cctv',
-        color: isActive ? COLOR_ACTIVE : COLOR_INACTIVE,
+        color: isActive ? COLOR_ACTIVE : COLOR_CAMERA,
       };
     }
     case 'cover': {

@@ -119,7 +119,11 @@ describe('getStateDisplay', () => {
   it('uses active color for streaming/recording cameras', () => {
     const streaming = getStateDisplay(makeEntity('camera.a', 'streaming'));
     expect(streaming.color).toContain('active');
+  });
+
+  it('uses the info-color for idle cameras (not the default inactive grey)', () => {
     const idle = getStateDisplay(makeEntity('camera.a', 'idle'));
-    expect(idle.color).not.toContain('active');
+    expect(idle.color).toContain('info-color');
+    expect(idle.color).not.toContain('paper-item-icon-color');
   });
 });
