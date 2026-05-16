@@ -47,6 +47,30 @@ class MockHaIcon extends HTMLElement {
 }
 customElements.define('ha-icon', MockHaIcon);
 
+// Mock fuer <ha-camera-stream>. In echtem HA waehlt das element automatisch
+// zwischen HLS / WebRTC / Mjpeg / Snapshot. In der Demo nutzen wir das
+// entity_picture als statisches Bild — reicht zur Visualisierung.
+class MockHaCameraStream extends HTMLElement {
+  private _stateObj?: { attributes?: { entity_picture?: string; friendly_name?: string } };
+  set stateObj(value: typeof this._stateObj) {
+    this._stateObj = value;
+    this.render();
+  }
+  connectedCallback() {
+    this.render();
+  }
+  private render() {
+    const picture = this._stateObj?.attributes?.entity_picture;
+    const name = this._stateObj?.attributes?.friendly_name ?? '';
+    if (typeof picture === 'string') {
+      this.innerHTML = `<img src="${picture}" alt="${name}" style="display:block;max-width:80vw;max-height:70vh;" />`;
+    } else {
+      this.innerHTML = `<div style="padding:24px;color:#888;text-align:center;">[Demo Mock] Kein entity_picture verfuegbar</div>`;
+    }
+  }
+}
+customElements.define('ha-camera-stream', MockHaCameraStream);
+
 const DEMO_IMAGE = buildDemoFloorplan();
 
 function buildCameraSnapshot(label: string, color: string): string {

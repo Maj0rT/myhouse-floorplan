@@ -52,19 +52,6 @@ export class DeviceMarker extends LitElement {
       cursor: move;
       border: 2px dashed var(--primary-color, #03a9f4);
     }
-    .marker.with-preview {
-      border-radius: 8px;
-      padding: 4px;
-    }
-    .preview {
-      width: 80px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 4px;
-      border: 2px solid;
-      display: block;
-      pointer-events: none;
-    }
     .icon {
       width: 24px;
       height: 24px;
@@ -135,25 +122,16 @@ export class DeviceMarker extends LitElement {
     const opacity = clampOpacity(this.backgroundOpacity);
     const markerStyle = `left: ${cssLeft}; top: ${cssTop}; --myhouse-marker-bg-opacity: ${opacity};`;
     const tooltip = this.resolveTooltip();
-    const hasPreview = typeof this.display.image_url === 'string' && this.display.image_url.length > 0;
-    const showIcon = !this.display.hide_icon && !hasPreview;
+    const showIcon = !this.display.hide_icon;
     return html`
       <div
-        class="marker ${this.editMode ? 'edit' : ''} ${hasPreview ? 'with-preview' : ''}"
+        class="marker ${this.editMode ? 'edit' : ''}"
         style=${markerStyle}
         title=${tooltip}
         @click=${this.handleClick}
         role="button"
         tabindex="0"
       >
-        ${hasPreview
-          ? html`<img
-              class="preview"
-              style="border-color: ${this.display.color};"
-              src=${this.display.image_url ?? ''}
-              alt=""
-            />`
-          : ''}
         ${showIcon
           ? html`<div class="icon" style="color: ${this.display.color};">
               <ha-icon icon=${iconToShow}></ha-icon>

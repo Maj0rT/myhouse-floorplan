@@ -108,17 +108,15 @@ describe('device-marker', () => {
     expect(haIcon?.getAttribute('icon')).toBe('mdi:lightbulb');
   });
 
-  it('renders an img preview instead of icon for camera entities', async () => {
+  it('renders the cctv icon for camera entities', async () => {
     el.entity = makeEntity('camera.flur', 'idle', {
       entity_picture: '/api/camera_proxy/camera.flur?token=xyz',
     });
     el.position = { x: 0, y: 0 };
     await nextRender(el);
-    const img = el.shadowRoot?.querySelector('img.preview') as HTMLImageElement;
-    expect(img).toBeTruthy();
-    expect(img.getAttribute('src')).toBe('/api/camera_proxy/camera.flur?token=xyz');
     const haIcon = el.shadowRoot?.querySelector('ha-icon');
-    expect(haIcon).toBeNull();
+    expect(haIcon?.getAttribute('icon')).toBe('mdi:cctv');
+    expect(el.shadowRoot?.querySelector('img')).toBeNull();
   });
 
   it('hides the icon when state-display sets hide_icon', async () => {

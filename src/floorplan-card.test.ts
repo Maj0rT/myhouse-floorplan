@@ -133,10 +133,11 @@ describe('floorplan-card', () => {
 
     const modal = el.shadowRoot?.querySelector('.camera-modal');
     expect(modal).toBeTruthy();
-    const streamImg = el.shadowRoot?.querySelector('img.camera-stream') as HTMLImageElement;
-    expect(streamImg.getAttribute('src')).toBe(
-      '/api/camera_proxy_stream/camera.flur?token=tok1',
-    );
+    const stream = el.shadowRoot?.querySelector(
+      'ha-camera-stream',
+    ) as HTMLElement & { stateObj?: { entity_id?: string } };
+    expect(stream).toBeTruthy();
+    expect(stream.stateObj?.entity_id).toBe('camera.flur');
     expect(hass.callService).not.toHaveBeenCalled();
   });
 

@@ -4,7 +4,6 @@ export interface StateDisplay {
   icon: string;
   color: string;
   text?: string;
-  image_url?: string;
   hide_icon?: boolean;
 }
 
@@ -62,13 +61,10 @@ export function getStateDisplay(entity: HassEntity | undefined): StateDisplay {
       };
     }
     case 'camera': {
-      const picture = entity.attributes?.entity_picture;
-      const pictureUrl = typeof picture === 'string' ? picture : undefined;
       const isActive = state === 'streaming' || state === 'recording';
       return {
         icon: 'mdi:cctv',
         color: isActive ? COLOR_ACTIVE : COLOR_INACTIVE,
-        image_url: pictureUrl,
       };
     }
     case 'cover': {

@@ -161,11 +161,6 @@ export class FloorplanCard extends LitElement {
   private renderCameraStream() {
     if (!this.cameraStreamEntityId) return '';
     const entity = this.hass?.states[this.cameraStreamEntityId];
-    const entityPicture = entity?.attributes?.entity_picture;
-    const streamUrl =
-      typeof entityPicture === 'string'
-        ? entityPicture.replace('/camera_proxy/', '/camera_proxy_stream/')
-        : '';
     const friendly = entity?.attributes?.friendly_name;
     const title =
       typeof friendly === 'string' && friendly.length > 0
@@ -190,10 +185,16 @@ export class FloorplanCard extends LitElement {
               ✕
             </button>
           </div>
-          ${streamUrl
-            ? html`<img class="camera-stream" src=${streamUrl} alt=${title} />`
+          ${entity
+            ? html`<ha-camera-stream
+                class="camera-stream"
+                .hass=${this.hass}
+                .stateObj=${entity}
+                allow-exoplayer
+                controls
+              ></ha-camera-stream>`
             : html`<div class="camera-stream-error">
-                Kein Stream-URL verfuegbar (entity_picture fehlt am Camera-Entity)
+                Camera-Entity nicht gefunden.
               </div>`}
         </div>
       </div>

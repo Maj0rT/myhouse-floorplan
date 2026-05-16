@@ -111,13 +111,8 @@ describe('getStateDisplay', () => {
     expect(result.hide_icon).toBeFalsy();
   });
 
-  it('returns entity_picture as image_url for camera entities', () => {
-    const result = getStateDisplay(
-      makeEntity('camera.flur', 'idle', {
-        entity_picture: '/api/camera_proxy/camera.flur?token=abc',
-      }),
-    );
-    expect(result.image_url).toBe('/api/camera_proxy/camera.flur?token=abc');
+  it('returns the cctv icon for camera entities', () => {
+    const result = getStateDisplay(makeEntity('camera.flur', 'idle'));
     expect(result.icon).toBe('mdi:cctv');
   });
 
