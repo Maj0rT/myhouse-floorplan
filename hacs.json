@@ -1,5 +1,6 @@
 {
   "name": "MyHouse Floorplan",
   "render_readme": true,
-  "filename": "myhouse-floorplan.js"
+  "filename": "myhouse-floorplan.js",
+  "homeassistant": "2024.1.0"
 }

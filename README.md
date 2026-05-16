@@ -97,6 +97,25 @@ git push && git push --tags
 
 Wenn der Workflow fehlschlaegt (z.B. rote Tests), wird kein Release erstellt — Tag bleibt aber bestehen. Nach Fix: Tag loeschen (`git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z`) und neu setzen.
 
+## HACS-Aufnahme (Default-Index)
+
+Damit die Karte ohne Custom-Repository-Konfiguration in HACS auffindbar ist, muss sie in den HACS-Default-Index aufgenommen werden — siehe `https://hacs.xyz/docs/publish/include/`. Voraussetzungen erfuellt:
+
+- `LICENSE`-Datei (MIT)
+- `hacs.json` mit `name`, `filename`, `render_readme`, `homeassistant`
+- README mit Installation und Konfiguration
+- GitHub-Release mit dem gebauten Bundle als Asset (siehe Release-Workflow)
+- Repository-Description, Topics: `home-assistant`, `hacs`, `lovelace`, `lovelace-custom-card`, `dashboard`
+- HACS-Validation-Action (`.github/workflows/hacs.yml`) prueft die Konformitaet auf jedem push
+
+Aufnahme-Prozess:
+
+1. Sicherstellen, dass der HACS-Validation-Workflow auf `main` gruen ist (Tab "Actions").
+2. Im Repository `hacs/default` einen PR einreichen, der den Repo-Slug `Maj0rT/myhouse-floorplan` in die Datei `plugin` einfuegt.
+3. Den `gh`-PR-Workflow oder den HACS-Maintainern folgen — Bewertung dauert typischerweise einige Tage bis Wochen.
+
+Bis dahin koennen Nutzer die Karte ueber **Custom Repository** installieren (siehe oben).
+
 ## Lizenz
 
 MIT
