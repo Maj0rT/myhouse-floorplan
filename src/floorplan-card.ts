@@ -96,9 +96,18 @@ export class FloorplanCard extends LitElement {
       background: var(--secondary-background-color, #f0f0f0);
     }
     .camera-stream {
-      width: 100%;
-      max-height: calc(90vh - 60px);
       display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: calc(90vh - 50px);
+      background: #000;
+    }
+    .camera-stream::part(video),
+    .camera-stream video,
+    .camera-stream img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
     .camera-stream-error {
       padding: 24px;
