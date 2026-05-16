@@ -8,12 +8,20 @@ export interface Position {
   y: number;
 }
 
+const DEFAULT_OPACITY = 0.85;
+
+function clampOpacity(value: number | undefined): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) return DEFAULT_OPACITY;
+  return Math.max(0, Math.min(1, value));
+}
+
 @customElement('myhouse-device-marker')
 export class DeviceMarker extends LitElement {
   @property({ attribute: false }) entity?: HassEntity;
   @property({ attribute: false }) position: Position = { x: 0, y: 0 };
   @property() label?: string;
   @property() icon?: string;
+  @property({ type: Number }) backgroundOpacity?: number;
   @property({ type: Boolean, attribute: 'edit-mode' }) editMode = false;
 
   @state() private display: StateDisplay = getStateDisplay(undefined);
@@ -102,10 +110,12 @@ export class DeviceMarker extends LitElement {
     const cssTop = `${this.position.y}%`;
     const labelText = this.resolveLabel();
     const iconToShow = this.icon && this.icon.length > 0 ? this.icon : this.display.icon;
+    const opacity = clampOpacity(this.backgroundOpacity);
+    const markerStyle = `left: ${cssLeft}; top: ${cssTop}; --myhouse-marker-bg-opacity: ${opacity};`;
     return html`
       <div
         class="marker ${this.editMode ? 'edit' : ''}"
-        style="left: ${cssLeft}; top: ${cssTop};"
+        style=${markerStyle}
         @click=${this.handleClick}
         role="button"
         tabindex="0"

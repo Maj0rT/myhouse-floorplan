@@ -41,6 +41,7 @@ export interface MarkerConfig {
   label?: string;
   icon?: string;
   tap_action?: TapAction;
+  background_opacity?: number;
 }
 
 export interface FloorplanConfig {
@@ -48,7 +49,6 @@ export interface FloorplanConfig {
   title?: string;
   image: string;
   aspect_ratio?: string;
-  marker_background_opacity?: number;
   markers: MarkerConfig[];
 }
 

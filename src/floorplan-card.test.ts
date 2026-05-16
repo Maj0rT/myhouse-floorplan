@@ -99,38 +99,27 @@ describe('floorplan-card', () => {
     expect(el.getCardSize()).toBeGreaterThan(0);
   });
 
-  it('applies marker_background_opacity as CSS variable on ha-card', async () => {
+  it('passes background_opacity from each marker through to the device-marker', async () => {
+    el.hass = makeHass();
     el.setConfig({
       type: 'custom:myhouse-floorplan',
       image: '/test.png',
-      marker_background_opacity: 0.5,
-      markers: [],
+      markers: [
+        { entity: 'light.kueche', x: 10, y: 20, background_opacity: 0.4 },
+        { entity: 'switch.tv', x: 30, y: 40 },
+      ],
     });
     await nextRender(el);
-    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
-    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 0.5');
-  });
-
-  it('falls back to default opacity 0.85 when not configured', async () => {
-    el.setConfig({
-      type: 'custom:myhouse-floorplan',
-      image: '/test.png',
-      markers: [],
-    });
-    await nextRender(el);
-    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
-    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 0.85');
-  });
-
-  it('clamps opacity to the [0, 1] range', async () => {
-    el.setConfig({
-      type: 'custom:myhouse-floorplan',
-      image: '/test.png',
-      marker_background_opacity: 5,
-      markers: [],
-    });
-    await nextRender(el);
-    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
-    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 1');
+    const markers = el.shadowRoot?.querySelectorAll(
+      'myhouse-device-marker',
+    ) as NodeListOf<HTMLElement & { backgroundOpacity?: number }>;
+    await (markers[0] as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    await (markers[1] as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    expect(markers[0].backgroundOpacity).toBe(0.4);
+    expect(markers[1].backgroundOpacity).toBeUndefined();
+    const style0 = markers[0].shadowRoot?.querySelector('.marker')?.getAttribute('style') ?? '';
+    const style1 = markers[1].shadowRoot?.querySelector('.marker')?.getAttribute('style') ?? '';
+    expect(style0).toContain('--myhouse-marker-bg-opacity: 0.4');
+    expect(style1).toContain('--myhouse-marker-bg-opacity: 0.85');
   });
 });

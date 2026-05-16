@@ -103,6 +103,20 @@ export class FloorplanCardEditor extends LitElement {
       border-radius: 4px;
       font-size: 12px;
     }
+    .opacity-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--secondary-text-color, #666);
+    }
+    .opacity-label {
+      flex: 0 0 110px;
+      font-variant-numeric: tabular-nums;
+    }
+    .opacity-input {
+      flex: 1;
+    }
     .preview {
       position: relative;
       margin-top: 8px;
@@ -146,9 +160,11 @@ export class FloorplanCardEditor extends LitElement {
     this.emitChange({ ...this.config, title: value });
   }
 
-  private onOpacityInput(event: Event): void {
-    const value = parseFloat((event.target as HTMLInputElement).value);
-    this.emitChange({ ...this.config, marker_background_opacity: value });
+  private updateMarkerOpacity(index: number, value: number): void {
+    const markers = this.config.markers.map((m, i) =>
+      i === index ? { ...m, background_opacity: value } : m,
+    );
+    this.emitChange({ ...this.config, markers });
   }
 
   private async onFileChange(event: Event): Promise<void> {
@@ -236,6 +252,7 @@ export class FloorplanCardEditor extends LitElement {
         .position=${{ x: marker.x, y: marker.y }}
         .label=${marker.label}
         .icon=${marker.icon ?? ''}
+        .backgroundOpacity=${marker.background_opacity}
         edit-mode
         @mousedown=${(e: MouseEvent) => this.startDrag(index, e)}
       ></myhouse-device-marker>
@@ -243,12 +260,6 @@ export class FloorplanCardEditor extends LitElement {
   }
 
   render() {
-    const rawOpacity = this.config.marker_background_opacity;
-    const opacity =
-      typeof rawOpacity === 'number' && !Number.isNaN(rawOpacity)
-        ? Math.max(0, Math.min(1, rawOpacity))
-        : 0.85;
-    const previewStyle = `--myhouse-marker-bg-opacity: ${opacity};`;
     return html`
       <div class="section upload-section">
         <div class="section-title">Etagenbild</div>
@@ -284,21 +295,6 @@ export class FloorplanCardEditor extends LitElement {
       </div>
 
       <div class="section">
-        <div class="section-title">
-          Marker-Hintergrund Deckkraft (${Math.round(opacity * 100)}%)
-        </div>
-        <input
-          type="range"
-          name="marker_background_opacity"
-          min="0"
-          max="1"
-          step="0.05"
-          .value=${String(opacity)}
-          @input=${this.onOpacityInput}
-        />
-      </div>
-
-      <div class="section">
         <div class="section-title">Geraet hinzufuegen</div>
         <myhouse-entity-picker-panel
           .hass=${this.hass}
@@ -315,8 +311,13 @@ export class FloorplanCardEditor extends LitElement {
               Noch keine Geraete platziert. Waehle ein Geraet oben aus.
             </div>`
           : html`<div class="marker-list">
-              ${this.config.markers.map(
-                (marker, index) => html`
+              ${this.config.markers.map((marker, index) => {
+                const op =
+                  typeof marker.background_opacity === 'number' &&
+                  !Number.isNaN(marker.background_opacity)
+                    ? Math.max(0, Math.min(1, marker.background_opacity))
+                    : 0.85;
+                return html`
                   <div class="marker-item">
                     <div class="marker-row">
                       <div class="entity">${marker.entity}</div>
@@ -335,9 +336,25 @@ export class FloorplanCardEditor extends LitElement {
                       @input=${(e: Event) =>
                         this.updateMarkerLabel(index, (e.target as HTMLInputElement).value)}
                     />
+                    <label class="opacity-row">
+                      <span class="opacity-label">Deckkraft: ${Math.round(op * 100)}%</span>
+                      <input
+                        type="range"
+                        class="opacity-input"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        .value=${String(op)}
+                        @input=${(e: Event) =>
+                          this.updateMarkerOpacity(
+                            index,
+                            parseFloat((e.target as HTMLInputElement).value),
+                          )}
+                      />
+                    </label>
                   </div>
-                `,
-              )}
+                `;
+              })}
             </div>`}
       </div>
 
@@ -346,7 +363,7 @@ export class FloorplanCardEditor extends LitElement {
           ? html`
               <div class="section">
                 <div class="section-title">Vorschau (Marker verschiebbar)</div>
-                <div class="preview" style=${previewStyle}>
+                <div class="preview">
                   <myhouse-floor-image .src=${this.config.image}>
                     ${this.config.markers.map((m, i) => this.renderMarker(m, i))}
                   </myhouse-floor-image>
