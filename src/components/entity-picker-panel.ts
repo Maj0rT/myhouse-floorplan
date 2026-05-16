@@ -2,6 +2,24 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from '../types.js';
 
+// Domains, die als marker auf dem floorplan sinnvoll sind — dort haben wir
+// dedizierte icons/farben (state-display.ts) und/oder eine sinnvolle
+// tap-action (service-call.ts). Domains ohne echten support (climate, lock,
+// media_player, zone, person, group, sun, weather, ...) werden ausgeblendet,
+// damit die liste nicht ueberfuellt wirkt.
+export const SUPPORTED_DOMAINS = new Set([
+  'light',
+  'switch',
+  'binary_sensor',
+  'sensor',
+  'cover',
+  'camera',
+  'automation',
+  'fan',
+  'input_boolean',
+  'script',
+]);
+
 @customElement('myhouse-entity-picker-panel')
 export class EntityPickerPanel extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
@@ -82,6 +100,7 @@ export class EntityPickerPanel extends LitElement {
     if (!this.hass) return [];
     const term = this.internalSearch.toLowerCase().trim();
     return Object.values(this.hass.states)
+      .filter((e) => SUPPORTED_DOMAINS.has(e.entity_id.split('.')[0]))
       .map((e) => ({
         id: e.entity_id,
         friendly:

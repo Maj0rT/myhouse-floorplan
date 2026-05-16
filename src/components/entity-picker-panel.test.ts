@@ -13,6 +13,9 @@ function makeHass(): HomeAssistant {
       'light.a': { entity_id: 'light.a', state: 'on', attributes: { friendly_name: 'Lampe A' } },
       'switch.b': { entity_id: 'switch.b', state: 'off', attributes: { friendly_name: 'Schalter B' } },
       'sensor.c': { entity_id: 'sensor.c', state: '21', attributes: { friendly_name: 'Sensor C' } },
+      'zone.home': { entity_id: 'zone.home', state: '1', attributes: { friendly_name: 'Zuhause' } },
+      'person.alice': { entity_id: 'person.alice', state: 'home', attributes: { friendly_name: 'Alice' } },
+      'media_player.tv': { entity_id: 'media_player.tv', state: 'idle', attributes: { friendly_name: 'Fernseher' } },
     },
     callService: vi.fn(),
   };
@@ -27,10 +30,14 @@ describe('entity-picker-panel', () => {
     document.body.appendChild(el);
   });
 
-  it('lists all entities by default', async () => {
+  it('lists only entities with supported domains', async () => {
     await nextRender(el);
     const options = el.shadowRoot?.querySelectorAll('.entity');
     expect(options?.length).toBe(3);
+    const texts = Array.from(options ?? []).map((o) => o.textContent ?? '');
+    expect(texts.some((t) => t.includes('zone.home'))).toBe(false);
+    expect(texts.some((t) => t.includes('person.alice'))).toBe(false);
+    expect(texts.some((t) => t.includes('media_player.tv'))).toBe(false);
   });
 
   it('filters entities by search term', async () => {
