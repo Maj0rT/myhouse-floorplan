@@ -31,10 +31,10 @@ export class DeviceMarker extends LitElement {
       align-items: center;
       gap: 4px;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, var(--myhouse-marker-bg-opacity, 0.85));
       border-radius: 50%;
       padding: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, calc(0.3 * var(--myhouse-marker-bg-opacity, 0.85)));
       transition: transform 0.1s ease;
     }
     .marker:hover {

@@ -9,6 +9,13 @@ function fireEvent(target: HTMLElement, type: string, detail: unknown): void {
   target.dispatchEvent(new CustomEvent(type, { detail, bubbles: true, composed: true }));
 }
 
+const DEFAULT_MARKER_OPACITY = 0.85;
+
+function clampOpacity(value: number | undefined): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) return DEFAULT_MARKER_OPACITY;
+  return Math.max(0, Math.min(1, value));
+}
+
 @customElement('myhouse-floorplan')
 export class FloorplanCard extends LitElement {
   @property({ attribute: false }) hass?: HomeAssistant;
@@ -94,9 +101,11 @@ export class FloorplanCard extends LitElement {
 
   render() {
     if (!this.config) return html``;
-    const { title, image, aspect_ratio, markers } = this.config;
+    const { title, image, aspect_ratio, markers, marker_background_opacity } = this.config;
+    const opacity = clampOpacity(marker_background_opacity);
+    const styleAttr = `--myhouse-marker-bg-opacity: ${opacity};`;
     return html`
-      <ha-card>
+      <ha-card style=${styleAttr}>
         ${title ? html`<div class="title">${title}</div>` : ''}
         <div class="image-wrap" @marker-click=${this.onMarkerClick}>
           <myhouse-floor-image

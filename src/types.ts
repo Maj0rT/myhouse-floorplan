@@ -48,6 +48,7 @@ export interface FloorplanConfig {
   title?: string;
   image: string;
   aspect_ratio?: string;
+  marker_background_opacity?: number;
   markers: MarkerConfig[];
 }
 

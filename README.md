@@ -53,6 +53,7 @@ markers:
 | `image` | string | — | URL zum Etagenbild. Wird vom Editor automatisch nach Upload gefuellt. |
 | `title` | string | — | Optionaler Titel oben auf der Karte. |
 | `aspect_ratio` | string | — | z.B. `16:9`. Standard: natuerliches Bildverhaeltnis. |
+| `marker_background_opacity` | number | `0.85` | Deckkraft des weissen Hintergrunds hinter den Marker-Icons (0 = unsichtbar, 1 = voll deckend). Im Editor als Slider verfuegbar; Wert wird auf `[0, 1]` geklemmt. |
 | `markers` | array | `[]` | Liste der platzierten Geraete. |
 | `markers[].entity` | string | — | Entity-ID. |
 | `markers[].x` | number | — | Position in % (0–100). |

@@ -98,4 +98,39 @@ describe('floorplan-card', () => {
     expect(typeof el.getCardSize).toBe('function');
     expect(el.getCardSize()).toBeGreaterThan(0);
   });
+
+  it('applies marker_background_opacity as CSS variable on ha-card', async () => {
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      marker_background_opacity: 0.5,
+      markers: [],
+    });
+    await nextRender(el);
+    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
+    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 0.5');
+  });
+
+  it('falls back to default opacity 0.85 when not configured', async () => {
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      markers: [],
+    });
+    await nextRender(el);
+    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
+    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 0.85');
+  });
+
+  it('clamps opacity to the [0, 1] range', async () => {
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      marker_background_opacity: 5,
+      markers: [],
+    });
+    await nextRender(el);
+    const haCard = el.shadowRoot?.querySelector('ha-card') as HTMLElement;
+    expect(haCard.getAttribute('style') ?? '').toContain('--myhouse-marker-bg-opacity: 1');
+  });
 });

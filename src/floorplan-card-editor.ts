@@ -146,6 +146,11 @@ export class FloorplanCardEditor extends LitElement {
     this.emitChange({ ...this.config, title: value });
   }
 
+  private onOpacityInput(event: Event): void {
+    const value = parseFloat((event.target as HTMLInputElement).value);
+    this.emitChange({ ...this.config, marker_background_opacity: value });
+  }
+
   private async onFileChange(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -238,6 +243,12 @@ export class FloorplanCardEditor extends LitElement {
   }
 
   render() {
+    const rawOpacity = this.config.marker_background_opacity;
+    const opacity =
+      typeof rawOpacity === 'number' && !Number.isNaN(rawOpacity)
+        ? Math.max(0, Math.min(1, rawOpacity))
+        : 0.85;
+    const previewStyle = `--myhouse-marker-bg-opacity: ${opacity};`;
     return html`
       <div class="section upload-section">
         <div class="section-title">Etagenbild</div>
@@ -269,6 +280,21 @@ export class FloorplanCardEditor extends LitElement {
           name="title"
           .value=${this.config.title ?? ''}
           @input=${this.onTitleInput}
+        />
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          Marker-Hintergrund Deckkraft (${Math.round(opacity * 100)}%)
+        </div>
+        <input
+          type="range"
+          name="marker_background_opacity"
+          min="0"
+          max="1"
+          step="0.05"
+          .value=${String(opacity)}
+          @input=${this.onOpacityInput}
         />
       </div>
 
@@ -320,7 +346,7 @@ export class FloorplanCardEditor extends LitElement {
           ? html`
               <div class="section">
                 <div class="section-title">Vorschau (Marker verschiebbar)</div>
-                <div class="preview">
+                <div class="preview" style=${previewStyle}>
                   <myhouse-floor-image .src=${this.config.image}>
                     ${this.config.markers.map((m, i) => this.renderMarker(m, i))}
                   </myhouse-floor-image>
