@@ -65,6 +65,22 @@ describe('device-marker', () => {
     expect(label?.textContent?.trim()).toBe('Kueche');
   });
 
+  it('sets a tooltip with friendly_name and entity_id', async () => {
+    el.entity = makeEntity('light.kueche', 'on', { friendly_name: 'Kueche Decke' });
+    el.position = { x: 0, y: 0 };
+    await nextRender(el);
+    const marker = el.shadowRoot?.querySelector('.marker') as HTMLElement;
+    expect(marker.getAttribute('title')).toBe('Kueche Decke (light.kueche)');
+  });
+
+  it('falls back to entity_id in tooltip when no friendly_name is set', async () => {
+    el.entity = makeEntity('switch.test', 'off');
+    el.position = { x: 0, y: 0 };
+    await nextRender(el);
+    const marker = el.shadowRoot?.querySelector('.marker') as HTMLElement;
+    expect(marker.getAttribute('title')).toBe('switch.test');
+  });
+
   it('hides the label when label prop is explicit empty string', async () => {
     el.entity = makeEntity('light.a', 'on', { friendly_name: 'Kueche' });
     el.position = { x: 0, y: 0 };

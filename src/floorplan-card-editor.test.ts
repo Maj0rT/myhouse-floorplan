@@ -98,6 +98,32 @@ describe('floorplan-card-editor', () => {
     expect(detail.config.markers).toHaveLength(0);
   });
 
+  it('removes a marker in the preview when Delete is pressed', async () => {
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '/test.png',
+      markers: [
+        { entity: 'light.a', x: 10, y: 20 },
+        { entity: 'switch.b', x: 30, y: 40 },
+      ],
+    });
+    await nextRender(el);
+    const listener = vi.fn();
+    el.addEventListener('config-changed', listener);
+
+    const markers = el.shadowRoot?.querySelectorAll(
+      'myhouse-device-marker',
+    ) as NodeListOf<HTMLElement>;
+    markers[0].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, composed: true }),
+    );
+
+    expect(listener).toHaveBeenCalled();
+    const detail = (listener.mock.calls.at(-1)![0] as CustomEvent).detail;
+    expect(detail.config.markers).toHaveLength(1);
+    expect(detail.config.markers[0].entity).toBe('switch.b');
+  });
+
   it('updates marker position on drag', async () => {
     el.setConfig({
       type: 'custom:myhouse-floorplan',

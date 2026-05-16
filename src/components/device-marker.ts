@@ -105,6 +105,15 @@ export class DeviceMarker extends LitElement {
     return this.entity?.entity_id ?? '';
   }
 
+  private resolveTooltip(): string {
+    const friendly = this.entity?.attributes?.friendly_name;
+    const entityId = this.entity?.entity_id ?? '';
+    if (typeof friendly === 'string' && friendly.length > 0) {
+      return entityId ? `${friendly} (${entityId})` : friendly;
+    }
+    return entityId;
+  }
+
   render() {
     const cssLeft = `${this.position.x}%`;
     const cssTop = `${this.position.y}%`;
@@ -112,10 +121,12 @@ export class DeviceMarker extends LitElement {
     const iconToShow = this.icon && this.icon.length > 0 ? this.icon : this.display.icon;
     const opacity = clampOpacity(this.backgroundOpacity);
     const markerStyle = `left: ${cssLeft}; top: ${cssTop}; --myhouse-marker-bg-opacity: ${opacity};`;
+    const tooltip = this.resolveTooltip();
     return html`
       <div
         class="marker ${this.editMode ? 'edit' : ''}"
         style=${markerStyle}
+        title=${tooltip}
         @click=${this.handleClick}
         role="button"
         tabindex="0"

@@ -203,6 +203,13 @@ export class FloorplanCardEditor extends LitElement {
     this.emitChange({ ...this.config, markers });
   }
 
+  private onMarkerKeydown(index: number, event: KeyboardEvent): void {
+    if (event.key === 'Delete') {
+      event.preventDefault();
+      this.removeMarker(index);
+    }
+  }
+
   private updateMarkerLabel(index: number, label: string): void {
     const markers = this.config.markers.map((m, i) =>
       i === index ? { ...m, label } : m,
@@ -219,6 +226,9 @@ export class FloorplanCardEditor extends LitElement {
 
   private startDrag(index: number, event: MouseEvent): void {
     event.preventDefault();
+    const host = event.currentTarget as HTMLElement;
+    const inner = host?.shadowRoot?.querySelector('.marker') as HTMLElement | null;
+    inner?.focus();
     this.draggingIndex = index;
     const onMove = (e: MouseEvent) => this.onDragMove(e);
     const onUp = () => {
@@ -255,6 +265,7 @@ export class FloorplanCardEditor extends LitElement {
         .backgroundOpacity=${marker.background_opacity}
         edit-mode
         @mousedown=${(e: MouseEvent) => this.startDrag(index, e)}
+        @keydown=${(e: KeyboardEvent) => this.onMarkerKeydown(index, e)}
       ></myhouse-device-marker>
     `;
   }
@@ -362,7 +373,9 @@ export class FloorplanCardEditor extends LitElement {
         ${this.config.image
           ? html`
               <div class="section">
-                <div class="section-title">Vorschau (Marker verschiebbar)</div>
+                <div class="section-title">
+                  Vorschau (Marker ziehen zum Verschieben, Entf-Taste zum Loeschen)
+                </div>
                 <div class="preview">
                   <myhouse-floor-image .src=${this.config.image}>
                     ${this.config.markers.map((m, i) => this.renderMarker(m, i))}
