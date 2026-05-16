@@ -58,8 +58,13 @@ export function getStateDisplay(entity: HassEntity | undefined): StateDisplay {
       const isOpen = state === 'open' ||
         (typeof entity.attributes?.current_position === 'number' &&
           entity.attributes.current_position > 0);
+      // Bewusst kein pickIcon: Manche Integrationen (z.B. Homematic) setzen
+      // fest 'mdi:window-shutter' im entity.attributes.icon — egal ob offen
+      // oder geschlossen. Wir leiten das icon vom state ab, damit der visuelle
+      // unterschied stimmt. Ein per-marker icon-override greift weiter (im
+      // device-marker).
       return {
-        icon: pickIcon(entity, 'mdi:window-shutter'),
+        icon: isOpen ? 'mdi:window-shutter-open' : 'mdi:window-shutter',
         color: isOpen ? COLOR_ACTIVE : COLOR_INACTIVE,
       };
     }

@@ -61,15 +61,31 @@ describe('getStateDisplay', () => {
     expect(result.text).toBe('42');
   });
 
-  it('returns cover icon and on color when open', () => {
+  it('returns open shutter icon and on color when cover is open', () => {
     const result = getStateDisplay(makeEntity('cover.a', 'open'));
-    expect(result.icon).toBe('mdi:window-shutter');
+    expect(result.icon).toBe('mdi:window-shutter-open');
     expect(result.color).toContain('active');
   });
 
-  it('returns cover off color when closed', () => {
+  it('returns closed shutter icon and off color when cover is closed', () => {
     const result = getStateDisplay(makeEntity('cover.a', 'closed'));
+    expect(result.icon).toBe('mdi:window-shutter');
     expect(result.color).not.toContain('active');
+  });
+
+  it('uses open icon for cover with position > 0 even if state is "closed"', () => {
+    const result = getStateDisplay(
+      makeEntity('cover.a', 'closed', { current_position: 50 }),
+    );
+    expect(result.icon).toBe('mdi:window-shutter-open');
+    expect(result.color).toContain('active');
+  });
+
+  it('ignores entity.attributes.icon for cover (homematic sets static window-shutter)', () => {
+    const result = getStateDisplay(
+      makeEntity('cover.a', 'open', { icon: 'mdi:window-shutter' }),
+    );
+    expect(result.icon).toBe('mdi:window-shutter-open');
   });
 
   it('falls back for unknown domain', () => {

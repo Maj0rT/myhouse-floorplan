@@ -18,6 +18,8 @@ const ICON_SVG: Record<string, string> = {
     '<path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1-12v5.27a2 2 0 1 0 2 0V8z"/>',
   'mdi:window-shutter':
     '<path d="M4 4h16v3H4zm0 5h16v3H4zm0 5h16v3H4zm0 5h16v2H4z"/>',
+  'mdi:window-shutter-open':
+    '<path d="M4 4h16v3H4zm0 5h16v2H4zm0 11v-3h16v3z"/>',
   'mdi:eye':
     '<path d="M12 4.5C7 4.5 2.7 7.6 1 12c1.7 4.4 6 7.5 11 7.5s9.3-3.1 11-7.5C21.3 7.6 17 4.5 12 4.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>',
   'mdi:help-circle-outline':
