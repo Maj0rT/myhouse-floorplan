@@ -98,7 +98,13 @@ export class EntityPickerPanel extends LitElement {
 
   private filterEntities(): Array<{ id: string; friendly: string }> {
     if (!this.hass) return [];
-    const term = this.internalSearch.toLowerCase().trim();
+    // Mehrere woerter werden per UND verknuepft und gegen die kombination
+    // aus entity-id und friendly_name geprueft. So findet z.B. 'temperature
+    // bad' auch 'sensor.heizung_bad_temperature'.
+    const tokens = this.internalSearch
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
     return Object.values(this.hass.states)
       .filter((e) => SUPPORTED_DOMAINS.has(e.entity_id.split('.')[0]))
       .map((e) => ({
@@ -108,12 +114,11 @@ export class EntityPickerPanel extends LitElement {
             ? e.attributes.friendly_name
             : e.entity_id,
       }))
-      .filter(
-        (e) =>
-          !term ||
-          e.id.toLowerCase().includes(term) ||
-          e.friendly.toLowerCase().includes(term),
-      )
+      .filter((e) => {
+        if (tokens.length === 0) return true;
+        const haystack = `${e.id} ${e.friendly}`.toLowerCase();
+        return tokens.every((t) => haystack.includes(t));
+      })
       .sort((a, b) => a.friendly.localeCompare(b.friendly));
   }
 
