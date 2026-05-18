@@ -123,8 +123,8 @@ export class FloorplanCard extends LitElement {
     if (!config) {
       throw new Error('Config required');
     }
-    if (!config.image || typeof config.image !== 'string') {
-      throw new Error('Property "image" ist erforderlich');
+    if (typeof config.image !== 'string') {
+      throw new Error('Property "image" muss ein String sein');
     }
     if (!Array.isArray(config.markers)) {
       throw new Error('Property "markers" muss ein Array sein');
@@ -229,6 +229,7 @@ export class FloorplanCard extends LitElement {
   render() {
     if (!this.config) return html``;
     const { title, image, aspect_ratio, markers } = this.config;
+    const hasImage = image.length > 0;
     return html`
       <ha-card>
         ${title ? html`<div class="title">${title}</div>` : ''}
@@ -237,7 +238,7 @@ export class FloorplanCard extends LitElement {
             .src=${image}
             .aspectRatio=${aspect_ratio ?? ''}
           >
-            ${markers.map((m) => this.renderMarker(m))}
+            ${hasImage ? markers.map((m) => this.renderMarker(m)) : ''}
           </myhouse-floor-image>
         </div>
       </ha-card>

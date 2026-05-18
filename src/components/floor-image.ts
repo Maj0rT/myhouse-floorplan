@@ -67,7 +67,9 @@ export class FloorImage extends LitElement {
 
   render() {
     if (!this.src) {
-      return html`<div class="placeholder">Kein Bild ausgewaehlt</div>`;
+      return html`<div class="placeholder">
+        Bitte ein Etagenbild auswaehlen (im Karten-Editor hochladen)
+      </div>`;
     }
     const style = this.aspectRatio
       ? `aspect-ratio: ${this.aspectRatio.replace(':', ' / ')};`

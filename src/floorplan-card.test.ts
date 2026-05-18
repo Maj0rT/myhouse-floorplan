@@ -33,14 +33,44 @@ describe('floorplan-card', () => {
     document.body.appendChild(el);
   });
 
-  it('throws if config has no image', () => {
+  it('accepts an empty image string (initial state after card insertion)', () => {
     expect(() =>
       el.setConfig({
         type: 'custom:myhouse-floorplan',
         markers: [],
         image: '',
       } as FloorplanConfig),
+    ).not.toThrow();
+  });
+
+  it('throws if image is missing entirely or not a string', () => {
+    expect(() =>
+      el.setConfig({
+        type: 'custom:myhouse-floorplan',
+        markers: [],
+      } as unknown as FloorplanConfig),
     ).toThrow();
+    expect(() =>
+      el.setConfig({
+        type: 'custom:myhouse-floorplan',
+        markers: [],
+        image: 42,
+      } as unknown as FloorplanConfig),
+    ).toThrow();
+  });
+
+  it('skips rendering markers when no image is set', async () => {
+    el.setConfig({
+      type: 'custom:myhouse-floorplan',
+      image: '',
+      markers: [
+        { entity: 'light.a', x: 10, y: 20 },
+        { entity: 'switch.b', x: 30, y: 40 },
+      ],
+    });
+    await nextRender(el);
+    const markers = el.shadowRoot?.querySelectorAll('myhouse-device-marker');
+    expect(markers?.length).toBe(0);
   });
 
   it('renders markers for configured entities', async () => {
