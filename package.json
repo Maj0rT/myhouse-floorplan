@@ -1,6 +1,6 @@
 {
   "name": "myhouse-floorplan",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Home Assistant Lovelace Card to display devices on a floor plan image",
   "type": "module",
   "main": "dist/myhouse-floorplan.js",
