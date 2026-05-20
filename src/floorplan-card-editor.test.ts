@@ -145,11 +145,16 @@ describe('floorplan-card-editor', () => {
     const previewMarker = el.shadowRoot?.querySelectorAll(
       'myhouse-device-marker',
     )[0] as HTMLElement;
-    previewMarker.dispatchEvent(
-      new MouseEvent('mousedown', { bubbles: true, composed: true }),
+    const downEvent = new PointerEvent('pointerdown', {
+      bubbles: true,
+      composed: true,
+      pointerId: 1,
+    });
+    previewMarker.dispatchEvent(downEvent);
+    window.dispatchEvent(
+      new PointerEvent('pointermove', { clientX: 100, clientY: 50, pointerId: 1 }),
     );
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 50 }));
-    window.dispatchEvent(new MouseEvent('mouseup'));
+    window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1 }));
 
     const lastCall = listener.mock.calls.at(-1);
     expect(lastCall).toBeDefined();

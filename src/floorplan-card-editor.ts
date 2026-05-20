@@ -224,23 +224,38 @@ export class FloorplanCardEditor extends LitElement {
     return entityId;
   }
 
-  private startDrag(index: number, event: MouseEvent): void {
+  private startDrag(index: number, event: PointerEvent): void {
     event.preventDefault();
     const host = event.currentTarget as HTMLElement;
     const inner = host?.shadowRoot?.querySelector('.marker') as HTMLElement | null;
     inner?.focus();
     this.draggingIndex = index;
-    const onMove = (e: MouseEvent) => this.onDragMove(e);
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+    // Pointer capture sorgt dafuer, dass wir alle move/up events bekommen,
+    // auch wenn der finger das ursprungs-element verlaesst (auf touch
+    // geraeten besonders wichtig).
+    try {
+      host?.setPointerCapture(event.pointerId);
+    } catch {
+      /* nicht alle elements unterstuetzen capture — fallback auf window */
+    }
+    const onMove = (e: PointerEvent) => this.onDragMove(e);
+    const onUp = (e: PointerEvent) => {
+      try {
+        host?.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
       this.draggingIndex = null;
     };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   }
 
-  private onDragMove(event: MouseEvent): void {
+  private onDragMove(event: PointerEvent): void {
     if (this.draggingIndex === null) return;
     const img = this.shadowRoot?.querySelector('myhouse-floor-image') as
       | (HTMLElement & { getImageRect(): DOMRect })
@@ -264,7 +279,7 @@ export class FloorplanCardEditor extends LitElement {
         .icon=${marker.icon ?? ''}
         .backgroundOpacity=${marker.background_opacity}
         edit-mode
-        @mousedown=${(e: MouseEvent) => this.startDrag(index, e)}
+        @pointerdown=${(e: PointerEvent) => this.startDrag(index, e)}
         @keydown=${(e: KeyboardEvent) => this.onMarkerKeydown(index, e)}
       ></myhouse-device-marker>
     `;

@@ -51,6 +51,7 @@ export class DeviceMarker extends LitElement {
     .marker.edit {
       cursor: move;
       border: 2px dashed var(--primary-color, #03a9f4);
+      touch-action: none;
     }
     .icon {
       width: 24px;
